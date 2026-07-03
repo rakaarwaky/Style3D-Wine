@@ -5,6 +5,7 @@
 - **Wine**: 11.12 (winehq-devel)
 - **Winetricks**: 20260125
 - **Style3D**: Style3D_prod_2026-06-22_18-13-20_9030965
+- **Repo**: https://github.com/rakaarwaky/Style3D-Wine
 
 ## Struktur Direktori
 ```
@@ -172,9 +173,29 @@ sleep 25
 echo "Done."
 ```
 
+### Auto-Install (1-klik)
+```bash
+# 1. Clone repo
+git clone https://github.com/rakaarwaky/Style3D-Wine.git
+cd Style3D-Wine
+
+# 2. Taruh installer .exe di folder exe/
+#    (download dari website Style3D)
+
+# 3. Jalankan auto-installer
+./install.sh
+
+# 4. Jalankan Style3D
+./style3d.sh
+```
+
+### Manual Steps
+(Lihat langkah 1-8 di atas jika auto-installer gagal.)
+
 ### Jalankan Style3D
 ```bash
-/home/raka/App/Wine/style3d.sh
+cd /home/raka/App/Wine
+./style3d.sh
 ```
 
 ## Troubleshooting
