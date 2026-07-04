@@ -1,30 +1,30 @@
 # Style3D Installation Guide via Wine (Linux)
 
-## Specifications
+## Spesifikasi
 - **OS**: Fedora 44
 - **Wine**: 11.12 (winehq-devel)
 - **Winetricks**: 20260125
 - **Style3D**: Style3D_prod_2026-06-22_18-13-20_9030965
 - **Repo**: https://github.com/rakaarwaky/Style3D-Wine
 
-## Directory Structure
+## Struktur Direktori
 ```
-/home/raka/Applications/Wine/
+/home/raka/App/Wine/
 ├── Style3D/                          # Wine prefix
 │   ├── drive_c/                      # Drive C: Windows
-│   │   ├── Program Files/Style3D/    # Style3D installation
+│   │   ├── Program Files/Style3D/    # Instalasi Style3D
 │   │   └── users/raka/              # User profile
 │   ├── dosdevices/                   # Drive mapping
-│   └── system.reg                    # Windows registry
+│   └── system.reg                    # Registry Windows
 ├── exe/
 │   └── Style3D_prod_2026-06-22_18-13-20_9030965.exe  # Installer
 ├── ca-certificates.crt               # SSL certificates
-└── style3d.sh                        # Launcher script
+└── style3d.sh                        # Script launcher
 ```
 
-## Installation Steps
+## Langkah Instalasi
 
-### 1. Create a New Wine Prefix
+### 1. Buat Wine Prefix Baru
 ```bash
 WINEPREFIX=/home/raka/Applications/Wine/Style3D WINEARCH=win64 wineboot --init
 ```
@@ -34,11 +34,11 @@ WINEPREFIX=/home/raka/Applications/Wine/Style3D WINEARCH=win64 wineboot --init
 # Download winetricks
 curl -L -o /tmp/winetricks https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks
 
-# Install to /usr/local/bin
+# Install ke /usr/local/bin
 sudo install -m 755 /tmp/winetricks /usr/local/bin/winetricks
 ```
 
-> **Note**: Winetricks cannot be installed via dnf due to conflicts with winehq-devel.
+> **Catatan**: Winetricks tidak bisa diinstall via dnf karena conflict dengan winehq-devel.
 
 ### 3. Install Dependencies
 ```bash
@@ -58,20 +58,20 @@ WINEPREFIX=/home/raka/Applications/Wine/Style3D wine reg add \
 
 ### 5. Copy SSL Certificates
 ```bash
-cp /etc/ssl/certs/ca-certificates.crt /home/raka/Applications/Wine/ca-certificates.crt
+cp /etc/ssl/certs/ca-certificates.crt /home/raka/App/Wine/ca-certificates.crt
 ```
 
-### 6. Fix bcp47langs.dll (32-bit for QtWebEngine)
+### 6. Fix bcp47langs.dll (32-bit untuk QtWebEngine)
 ```bash
-# Download bcp47langs.dll 32-bit from GitHub release
-# Copy to syswow64 and Style3D directory
-SYSWOW64="/home/raka/Applications/Wine/Style3D/drive_c/windows/syswow64"
-STYLE3D_DIR="/home/raka/Applications/Wine/Style3D/drive_c/Program Files/Style3D"
+# Download bcp47langs.dll 32-bit dari GitHub release
+# Copy ke syswow64 dan direktori Style3D
+SYSWOW64="/home/raka/App/Wine/Style3D/drive_c/windows/syswow64"
+STYLE3D_DIR="/home/raka/App/Wine/Style3D/drive_c/Program Files/Style3D"
 cp /path/to/bcp47langs_32bit.dll "$SYSWOW64/bcp47langs.dll"
 cp /path/to/bcp47langs_32bit.dll "$STYLE3D_DIR/bcp47langs.dll"
 
 # Registry override
-WINEPREFIX=/home/raka/Applications/Wine/Style3D wine reg add \
+WINEPREFIX=/home/raka/App/Wine/Style3D wine reg add \
   "HKCU\\Software\\Wine\\DllOverrides" /v "bcp47langs" /t REG_SZ /d "" /f
 ```
 
@@ -81,7 +81,7 @@ Wine bug: `VirtualProtect` returns `WRITECOPY (0x08)` instead of `READWRITE (0x0
 ```bash
 python3 << 'PYEOF'
 import struct
-dll = "/home/raka/Applications/Wine/Style3D/drive_c/Program Files/Style3D/Qt6WebEngineCore.dll"
+dll = "/home/raka/App/Wine/Style3D/drive_c/Program Files/Style3D/Qt6WebEngineCore.dll"
 crash_rva = 0x3d79301
 
 # Backup
@@ -110,16 +110,16 @@ with open(dll, 'r+b') as f:
 PYEOF
 ```
 
-### 8. Run the Installer
+### 8. Jalankan Installer
 ```bash
-WINEPREFIX=/home/raka/Applications/Wine/Style3D wine \
-  "/home/raka/Applications/Wine/exe/Style3D_prod_2026-06-22_18-13-20_9030965.exe"
+WINEPREFIX=/home/raka/App/Wine/Style3D wine \
+  "/home/raka/App/Wine/exe/Style3D_prod_2026-06-22_18-13-20_9030965.exe"
 ```
 
-## Launcher Script (style3d.sh)
+## Script Launcher (style3d.sh)
 ```bash
 #!/bin/bash
-export WINEPREFIX="/home/raka/Applications/Wine/Style3D"
+export WINEPREFIX="/home/raka/App/Wine/Style3D"
 export WINEARCH="win64"
 export WINEDEBUG=-all
 
@@ -127,11 +127,11 @@ export WINEDEBUG=-all
 wine reg add "HKCU\\Software\\Wine\\AppDefaults\\Style3D.exe" /v Version /d win10 /f 2>/dev/null
 wine reg add "HKCU\\Software\\Wine\\AppDefaults\\QtWebEngineProcess.exe" /v Version /d win10 /f 2>/dev/null
 
-# DLL overrides (bcp47langs requires native 32-bit DLL)
+# bcp47langs override (perlu native 32-bit DLL)
 export WINEDLLOVERRIDES="secur32=builtin;bcp47langs=native"
 
 # SSL certificates
-CA_CERT_PATH="/home/raka/Applications/Wine/ca-certificates.crt"
+CA_CERT_PATH="/home/raka/App/Wine/ca-certificates.crt"
 if [ ! -f "$CA_CERT_PATH" ]; then
     cp /etc/ssl/certs/ca-certificates.crt "$CA_CERT_PATH" 2>/dev/null
 fi
@@ -173,34 +173,34 @@ sleep 25
 echo "Done."
 ```
 
-### Auto-Install (1-click)
+### Auto-Install (1-klik)
 ```bash
 # 1. Clone repo
 git clone https://github.com/rakaarwaky/Style3D-Wine.git
 cd Style3D-Wine
 
-# 2. Place the .exe installer in the exe/ folder
-#    (download from the Style3D website)
+# 2. Taruh installer .exe di folder exe/
+#    (download dari website Style3D)
 
-# 3. Run the auto-installer
+# 3. Jalankan auto-installer
 ./install.sh
 
-# 4. Launch Style3D
+# 4. Jalankan Style3D
 ./style3d.sh
 ```
 
 ### Manual Steps
-(See steps 1–8 above if the auto-installer fails.)
+(Lihat langkah 1-8 di atas jika auto-installer gagal.)
 
-### Launch Style3D
+### Jalankan Style3D
 ```bash
-cd /home/raka/Applications/Wine
+cd /home/raka/App/Wine
 ./style3d.sh
 ```
 
 ## Troubleshooting
 
-### Wine Fails to Start
+### Wine Gagal Start
 ```bash
 killall -9 wineserver winedevice
 WINEPREFIX=/home/raka/Applications/Wine/Style3D wineboot --fixme
@@ -216,7 +216,7 @@ rm -rf "/home/raka/Applications/Wine/Style3D/drive_c/users/raka/AppData/Local/St
 rm -rf /home/raka/Applications/Wine/Style3D
 ```
 
-### Re-patch Qt6WebEngineCore.dll (after Style3D update)
+### Re-patch Qt6WebEngineCore.dll (setelah update Style3D)
 ```bash
 python3 << 'PYEOF'
 import struct, shutil
@@ -243,14 +243,14 @@ with open(dll, 'r+b') as f:
                 f.write(b'\x90')
                 print(f"Patched INT3 at RVA 0x{crash_rva:08x}")
             else:
-                print(f"Byte at offset is not INT3: 0x{b[0]:02x}, find the new crash RVA")
+                print(f"Byte at offset bukan INT3: 0x{b[0]:02x}, cari crash RVA baru")
             break
 PYEOF
 ```
 
-> **Note**: After each Style3D update, `Qt6WebEngineCore.dll` may change and the patch needs to be re-applied. Check the crash address from the latest error log if the offset `0x3d79301` has changed.
+> **Catatan**: Setiap Style3D update, `Qt6WebEngineCore.dll` mungkin berubah dan patch perlu diulang. Cek crash address dari error log terbaru jika offset `0x3d79301` berubah.
 
-### Re-install bcp47langs.dll (after Style3D update)
+### Re-install bcp47langs.dll (setelah update Style3D)
 ```bash
 SYSWOW64="/home/raka/Applications/Wine/Style3D/drive_c/windows/syswow64"
 STYLE3D_DIR="/home/raka/Applications/Wine/Style3D/drive_c/Program Files/Style3D"
@@ -262,19 +262,19 @@ WINEPREFIX=/home/raka/Applications/Wine/Style3D wine reg add \
   "HKCU\\Software\\Wine\\DllOverrides" /v "bcp47langs" /t REG_SZ /d "" /f
 ```
 
-### Check Wine Version
+### Cek Wine Version
 ```bash
 wine --version
 WINEPREFIX=/home/raka/Applications/Wine/Style3D wine cmd /c echo %WINEPREFIX%
 ```
 
-## Important Environment Variables
-| Variable | Value | Purpose |
-|----------|-------|---------|
+## Environment Variables Penting
+| Variable | Value | Fungsi |
+|----------|-------|--------|
 | `WINEPREFIX` | `/home/raka/Applications/Wine/Style3D` | Wine prefix location |
-| `WINEARCH` | `win64` | Windows architecture |
+| `WINEARCH` | `win64` | Arsitektur Windows |
 | `WINEDEBUG` | `-all` | Disable debug logs |
 | `STAGING_WRITECOPY` | `1` | Fix QtWebEngine crash |
 | `QTWEBENGINE_DISABLE_SANDBOX` | `1` | Disable Chromium sandbox |
-| `WINEDLLOVERRIDES` | `secur32=builtin;bcp47langs=native` | DLL override settings |
+| `WINEDLLOVERRIDES` | `dwrite=b;secur32=builtin;crypt32=builtin;bcp47langs=native` | DLL override settings |
 | `SSL_CERT_FILE` | `/home/raka/Applications/Wine/ca-certificates.crt` | SSL certificates |
