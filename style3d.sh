@@ -8,7 +8,7 @@ wine reg add "HKCU\\Software\\Wine\\AppDefaults\\Style3D.exe" /v Version /d win1
 wine reg add "HKCU\\Software\\Wine\\AppDefaults\\QtWebEngineProcess.exe" /v Version /d win10 /f 2>/dev/null
 
 # bcp47langs override (perlu native 32-bit DLL)
-export WINEDLLOVERRIDES="$WINEDLLOVERRIDES;bcp47langs=native"
+# WINEDLLOVERRIDES will be set fully below (line 50)
 
 # Auto-patch Qt6WebEngineCore.dll INT3 crash (VirtualProtect WRITECOPY bug)
 QT6CORE="$WINEPREFIX/drive_c/Program Files/Style3D/Qt6WebEngineCore.dll"
@@ -40,14 +40,14 @@ with open('$QT6CORE', 'r+b') as f:
 fi
 
 # SSL certificates
-CA_CERT_PATH="/home/raka/App/Wine/ca-certificates.crt"
+CA_CERT_PATH="/home/raka/Applications/Wine/ca-certificates.crt"
 if [ ! -f "$CA_CERT_PATH" ]; then
     cp /etc/ssl/certs/ca-certificates.crt "$CA_CERT_PATH" 2>/dev/null
 fi
 export SSL_CERT_FILE="$CA_CERT_PATH"
 
 # DLL overrides (biarkan dwrite default biar fallback ke builtin Wine)
-export WINEDLLOVERRIDES="secur32=builtin"
+export WINEDLLOVERRIDES="secur32=builtin;bcp47langs=native"
 
 # Staging writecopy for QtWebEngine
 export STAGING_WRITECOPY=1
