@@ -52,9 +52,9 @@ export WINEDLLOVERRIDES="secur32=builtin;bcp47langs=native"
 # Staging writecopy for QtWebEngine
 export STAGING_WRITECOPY=1
 
-# Disable Qt WebEngine sandbox & use ANGLE (D3D11 → OpenGL wrapper)
+# Disable Qt WebEngine sandbox & GPU (software rendering for Wine compat)
 export QTWEBENGINE_DISABLE_SANDBOX=1
-export QTWEBENGINE_CHROMIUM_FLAGS="--no-sandbox --disable-gpu-sandbox --disable-namespace-sandbox --disable-software-rasterizer --use-gl=angle --use-angle=d3d11"
+export QTWEBENGINE_CHROMIUM_FLAGS="--no-sandbox --disable-gpu-sandbox --disable-namespace-sandbox --disable-gpu --disable-gpu-compositing"
 
 # Reset autosave to bypass "Abnormal Close" dialog
 AUTOSAVE_JSON="$WINEPREFIX/drive_c/users/raka/AppData/Local/Style3D/Preference/projectAutoSaveInfos.json"

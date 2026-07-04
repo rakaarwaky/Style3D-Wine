@@ -19,7 +19,9 @@
 ├── exe/
 │   └── Style3D_prod_2026-06-22_18-13-20_9030965.exe  # Installer
 ├── ca-certificates.crt               # SSL certificates
-└── style3d.sh                        # Script launcher
+├── style3d.sh                        # Script launcher
+├── package/                          # Package depedensi
+└── AGENTS.md                         # File ini
 ```
 
 ## Langkah Instalasi
