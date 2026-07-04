@@ -80,7 +80,7 @@ sleep 2
 echo "Wine: $(wine --version)"
 echo "Starting Style3D..."
 
-DISPLAY=:0 wine explorer /desktop=Default,1920x1080 "C:\\Program Files\\Style3D\\Style3D.exe" &
+wine explorer /desktop=Default,1920x1080 "C:\\Program Files\\Style3D\\Style3D.exe" &
 echo "PID: $!"
 sleep 25
 echo "Done."
