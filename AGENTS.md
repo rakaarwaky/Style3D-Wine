@@ -142,9 +142,20 @@ export SSL_CERT_FILE="$CA_CERT_PATH"
 # Staging writecopy for QtWebEngine
 export STAGING_WRITECOPY=1
 
-# Disable Qt WebEngine sandbox & GPU
+# Staging writecopy for QtWebEngine
+export STAGING_WRITECOPY=1
+
+# Disable Qt WebEngine sandbox & GPU (software rendering for Wine compat)
 export QTWEBENGINE_DISABLE_SANDBOX=1
 export QTWEBENGINE_CHROMIUM_FLAGS="--no-sandbox --disable-gpu-sandbox --disable-namespace-sandbox --disable-gpu --disable-gpu-compositing"
+
+# Auto-cleanup leftover Wine processes after exit
+cleanup() {
+    killall -9 wineserver winedevice 2>/dev/null
+    wineserver -k 2>/dev/null
+    echo "Cleanup done."
+}
+trap cleanup SIGINT SIGTERM
 
 # Reset autosave to bypass "Abnormal Close" dialog
 AUTOSAVE_JSON="$WINEPREFIX/drive_c/users/raka/AppData/Local/Style3D/Preference/projectAutoSaveInfos.json"
@@ -264,6 +275,39 @@ WINEPREFIX=/home/raka/Applications/Wine/Style3D wine reg add \
   "HKCU\\Software\\Wine\\DllOverrides" /v "bcp47langs" /t REG_SZ /d "" /f
 ```
 
+### Webstore / QtWebEngine White Screen
+Style3D webstore atau panel web lainnya tampil putih (blank) karena QtWebEngine gagal render.
+
+**Penyebab:** QtWebEngine dipaksa render via GPU/ANGLE/D3D11 (`--use-gl=angle --use-angle=d3d11`) sementara software rasterizer dimatikan (`--disable-software-rasterizer`). Di Wine, D3D11 sering gagal untuk WebGL/web content → white screen tanpa crash.
+
+**Fix:** Ganti `QTWEBENGINE_CHROMIUM_FLAGS` di `style3d.sh`:
+```bash
+# Sebelum (ANGLE/D3D11 - white screen di Wine):
+export QTWEBENGINE_CHROMIUM_FLAGS="--no-sandbox --disable-gpu-sandbox --disable-namespace-sandbox --disable-software-rasterizer --use-gl=angle --use-angle=d3d11"
+
+# Sesudah (software rendering - kompatibel Wine):
+export QTWEBENGINE_CHROMIUM_FLAGS="--no-sandbox --disable-gpu-sandbox --disable-namespace-sandbox --disable-gpu --disable-gpu-compositing"
+```
+
+### Debug QtWebEngine
+Aktifkan verbose logging untuk diagnosa:
+```bash
+export WINEDEBUG=+loaddll,+seh,+msgbox
+export QTWEBENGINE_CHROMIUM_FLAGS="$QTWEBENGINE_CHROMIUM_FLAGS --enable-logging --v=1"
+export QTWEBENGINE_REMOTE_DEBUGGING=9999  # Buka http://localhost:9999 di browser
+```
+
+### Wine Processes Nyangkut Setelah Close
+Style3D keluar tapi proses `wineserver`, `winedevice`, `explorer.exe`, atau `QtWebEngineProcess.exe` masih jalan.
+
+**Fix manual:**
+```bash
+killall -9 wineserver winedevice
+wineserver -k
+```
+
+**Fix otomatis:** Script `style3d.sh` sudah include `trap cleanup` + `wait` loop yang akan cleanup otomatis saat Style3D exit atau di-Ctrl+C.
+
 ### Cek Wine Version
 ```bash
 wine --version
@@ -278,5 +322,6 @@ WINEPREFIX=/home/raka/Applications/Wine/Style3D wine cmd /c echo %WINEPREFIX%
 | `WINEDEBUG` | `-all` | Disable debug logs |
 | `STAGING_WRITECOPY` | `1` | Fix QtWebEngine crash |
 | `QTWEBENGINE_DISABLE_SANDBOX` | `1` | Disable Chromium sandbox |
-| `WINEDLLOVERRIDES` | `dwrite=b;secur32=builtin;crypt32=builtin;bcp47langs=native` | DLL override settings |
+| `WINEDLLOVERRIDES` | `secur32=builtin;bcp47langs=native` | DLL override settings |
+| `QTWEBENGINE_CHROMIUM_FLAGS` | `--no-sandbox --disable-gpu-sandbox --disable-namespace-sandbox --disable-gpu --disable-gpu-compositing` | Chromium flags (software rendering) |
 | `SSL_CERT_FILE` | `/home/raka/Applications/Wine/ca-certificates.crt` | SSL certificates |

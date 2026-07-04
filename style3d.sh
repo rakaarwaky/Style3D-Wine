@@ -80,7 +80,34 @@ sleep 2
 echo "Wine: $(wine --version)"
 echo "Starting Style3D..."
 
+# Trap SIGINT/SIGTERM for cleanup on Ctrl+C
+cleanup() {
+    echo ""
+    echo "Cleaning up Wine processes..."
+    killall -9 wineserver winedevice 2>/dev/null
+    # Kill remaining Wine processes (QtWebEngineProcess, explorer)
+    winedbg --command "info proc" 2>/dev/null | grep -E "Style3D|QtWebEngine|explorer" | while read -r line; do
+        pid=$(echo "$line" | awk '{print $2}')
+        [ -n "$pid" ] && kill "$pid" 2>/dev/null
+    done
+    wineserver -k 2>/dev/null
+    echo "Cleanup done."
+    exit 0
+}
+trap cleanup SIGINT SIGTERM
+
 wine explorer /desktop=Default,1920x1080 "C:\\Program Files\\Style3D\\Style3D.exe" &
-echo "PID: $!"
-sleep 25
-echo "Done."
+EXPLORER_PID=$!
+echo "Explorer PID: $EXPLORER_PID"
+
+# Wait for Style3D to exit (poll every 5s)
+while true; do
+    if ! pgrep -f "Style3D.exe" >/dev/null 2>&1; then
+        echo "Style3D exited."
+        break
+    fi
+    sleep 5
+done
+
+# Cleanup after exit
+cleanup
