@@ -1,5 +1,5 @@
 #!/bin/bash
-export WINEPREFIX="/home/raka/App/Wine/Style3D"
+export WINEPREFIX="/home/raka/Applications/Wine/Style3D"
 export WINEARCH="win64"
 export WINEDEBUG=-all
 
