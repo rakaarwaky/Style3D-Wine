@@ -84,12 +84,7 @@ echo "Starting Style3D..."
 cleanup() {
     echo ""
     echo "Cleaning up Wine processes..."
-    killall -9 wineserver winedevice 2>/dev/null
-    # Kill remaining Wine processes (QtWebEngineProcess, explorer)
-    winedbg --command "info proc" 2>/dev/null | grep -E "Style3D|QtWebEngine|explorer" | while read -r line; do
-        pid=$(echo "$line" | awk '{print $2}')
-        [ -n "$pid" ] && kill "$pid" 2>/dev/null
-    done
+    killall -9 wineserver winedevice CrashServer explorer.exe QtWebEngineProcess 2>/dev/null
     wineserver -k 2>/dev/null
     echo "Cleanup done."
     exit 0

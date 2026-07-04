@@ -302,7 +302,7 @@ Style3D keluar tapi proses `wineserver`, `winedevice`, `explorer.exe`, atau `QtW
 
 **Fix manual:**
 ```bash
-killall -9 wineserver winedevice
+killall -9 wineserver winedevice CrashServer
 wineserver -k
 ```
 
