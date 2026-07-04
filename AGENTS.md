@@ -285,8 +285,8 @@ Style3D webstore atau panel web lainnya tampil putih (blank) karena QtWebEngine 
 # Sebelum (ANGLE/D3D11 - white screen di Wine):
 export QTWEBENGINE_CHROMIUM_FLAGS="--no-sandbox --disable-gpu-sandbox --disable-namespace-sandbox --disable-software-rasterizer --use-gl=angle --use-angle=d3d11"
 
-# Sesudah (software rendering - kompatibel Wine):
-export QTWEBENGINE_CHROMIUM_FLAGS="--no-sandbox --disable-gpu-sandbox --disable-namespace-sandbox --disable-gpu --disable-gpu-compositing"
+# Sesudah (software rendering + ignore SSL errors - kompatibel Wine):
+export QTWEBENGINE_CHROMIUM_FLAGS="--no-sandbox --disable-gpu-sandbox --disable-namespace-sandbox --disable-gpu --disable-gpu-compositing --ignore-certificate-errors"
 ```
 
 ### Debug QtWebEngine
@@ -323,5 +323,5 @@ WINEPREFIX=/home/raka/Applications/Wine/Style3D wine cmd /c echo %WINEPREFIX%
 | `STAGING_WRITECOPY` | `1` | Fix QtWebEngine crash |
 | `QTWEBENGINE_DISABLE_SANDBOX` | `1` | Disable Chromium sandbox |
 | `WINEDLLOVERRIDES` | `secur32=builtin;bcp47langs=native` | DLL override settings |
-| `QTWEBENGINE_CHROMIUM_FLAGS` | `--no-sandbox --disable-gpu-sandbox --disable-namespace-sandbox --disable-gpu --disable-gpu-compositing` | Chromium flags (software rendering) |
+| `QTWEBENGINE_CHROMIUM_FLAGS` | `--no-sandbox --disable-gpu-sandbox --disable-namespace-sandbox --disable-gpu --disable-gpu-compositing --ignore-certificate-errors` | Chromium flags (software rendering) |
 | `SSL_CERT_FILE` | `/home/raka/Applications/Wine/ca-certificates.crt` | SSL certificates |

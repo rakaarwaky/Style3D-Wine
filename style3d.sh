@@ -54,7 +54,7 @@ export STAGING_WRITECOPY=1
 
 # Disable Qt WebEngine sandbox & GPU (software rendering for Wine compat)
 export QTWEBENGINE_DISABLE_SANDBOX=1
-export QTWEBENGINE_CHROMIUM_FLAGS="--no-sandbox --disable-gpu-sandbox --disable-namespace-sandbox --disable-gpu --disable-gpu-compositing"
+export QTWEBENGINE_CHROMIUM_FLAGS="--no-sandbox --disable-gpu-sandbox --disable-namespace-sandbox --disable-gpu --disable-gpu-compositing --ignore-certificate-errors"
 
 # Reset autosave to bypass "Abnormal Close" dialog
 AUTOSAVE_JSON="$WINEPREFIX/drive_c/users/raka/AppData/Local/Style3D/Preference/projectAutoSaveInfos.json"
@@ -84,7 +84,10 @@ echo "Starting Style3D..."
 cleanup() {
     echo ""
     echo "Cleaning up Wine processes..."
-    killall -9 wineserver winedevice CrashServer explorer.exe QtWebEngineProcess 2>/dev/null
+    # Kill all Wine processes from this prefix
+    ps aux | grep "$WINEPREFIX" | grep -v grep | awk '{print $2}' | xargs -r kill -9 2>/dev/null
+    killall -9 wineserver winedevice CrashServer explorer.exe QtWebEngineProcess \
+      services.exe svchost.exe mscorsvw.exe plugplay.exe rpcss.exe 2>/dev/null
     wineserver -k 2>/dev/null
     echo "Cleanup done."
     exit 0
